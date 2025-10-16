@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARM BOT - Agricultural Robot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        :root {
+            --primary-green: #27ae60;
+            --primary-yellow: #f39c12;
+            --primary-blue: #3498db;
+            --primary-red: #e74c3c;
+            --dark-bg: #2c3e50;
+            --light-bg: #ecf0f1;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2f3a 0%, #2c3e50 100%);
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #34495e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border: 2px solid var(--primary-green);
+        }
+
+        .robot-title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .robot-title span:nth-child(1) { color: var(--primary-green); }
+        .robot-title span:nth-child(2) { color: var(--primary-yellow); }
+
+        .password-input {
+            padding: 15px;
+            font-size: 1.5em;
+            width: 200px;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.9);
+            -webkit-text-security: disc; /* إخفاء النص */
+        }
+
+        .login-btn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #2ecc71;
+            transform: scale(1.05);
+        }
+
+        /* Main Interface */
+        #main-interface {
+            display: none;
+            grid-template-areas: 
+                "header header"
+                "content sidebar"
+                "footer footer";
+            grid-template-rows: 80px 1fr 60px;
+            grid-template-columns: 1fr 300px;
+            height: 100vh;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        /* Header */
+        header {
+            grid-area: header;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mode-indicator {
+            background: var(--primary-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-area: content;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mode-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .mode-card {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2980b9 100%);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .mode-card i {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .mode-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        /* Auto Mode */
+        #auto-mode {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .auto-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .auto-option {
+            background: linear-gradient(135deg, var(--primary-green) 0%, #27ae60 100%);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 30px;
+        }
+
+        .auto-option:hover {
+            transform: scale(1.05);
+        }
+
+        /* Manual Mode */
+        #manual-mode {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .manual-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-blue);
+        }
+
+        .tab-content {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Steering Control */
+        #steering-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 20px auto;
+        }
+
+        #steering-area {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        #steering-knob {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-yellow);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: move;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 3px solid white;
+        }
+
+        .steering-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        /* Movement Buttons */
+        .movement-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .movement-btn {
+            padding: 20px 30px;
+            background: var(--primary-blue);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .movement-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        /* Arm Control */
+        .arm-sliders {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .arm-slider {
+            margin: 15px 0;
+        }
+
+        .arm-slider label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-yellow);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* Sidebar */
+        sidebar {
+            grid-area: sidebar;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sensor-data {
+            font-size: 1.1em;
+            margin: 8px 0;
+        }
+
+        .sensor-value {
+            color: var(--primary-yellow);
+            float: right;
+        }
+
+        /* Footer */
+        footer {
+            grid-area: footer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+        }
+
+        .btn-secondary {
+            background: var(--primary-blue);
+        }
+
+        .btn-danger {
+            background: var(--primary-red);
+        }
+
+        .btn-warning {
+            background: var(--primary-yellow);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* RTL Support */
+        body.rtl {
+            direction: rtl;
+        }
+
+        body.rtl .sensor-value {
+            float: left;
+        }
+
+        body.rtl .back-btn {
+            align-self: flex-end;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .active {
+            display: flex !important;
+        }
+
+        .back-btn {
+            background: #7f8c8d;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+
+        .sensor-warning {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        .sensor-normal {
+            color: var(--primary-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="robot-title">
+                <span>FARM</span> <span>BOT</span>
+            </div>
+            <input type="password" class="password-input" id="password-input" placeholder="****" maxlength="4" inputmode="numeric">
+            <button class="login-btn" id="login-btn">ENTER</button>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div id="main-interface">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <button class="btn btn-secondary" id="language-btn">
+                    <span id="lang-text">العربية</span>
+                </button>
+                <div class="mode-indicator" id="mode-indicator">READY</div>
+            </div>
+            <div class="header-center">
+                <div class="robot-title">
+                    <span>FARM</span> <span>BOT</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-danger" id="power-btn">START</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mode Selection -->
+            <div class="mode-selection" id="mode-selection">
+                <div class="mode-card" id="auto-mode-btn">
+                    <div>🤖</div>
+                    <h2 id="auto-mode-text">AUTO MODE</h2>
+                    <p id="auto-desc">Autonomous operations</p>
+                </div>
+                <div class="mode-card" id="manual-mode-btn">
+                    <div>🎮</div>
+                    <h2 id="manual-mode-text">MANUAL MODE</h2>
+                    <p id="manual-desc">Remote control</p>
+                </div>
+            </div>
+
+            <!-- Auto Mode Content -->
+            <div id="auto-mode" class="hidden">
+                <button class="btn back-btn" id="auto-back-btn">← BACK</button>
+                <div class="auto-options">
+                    <div class="auto-option" id="files-btn">
+                        <div>📁</div>
+                        <h3 id="files-text">FILES</h3>
+                        <p id="files-desc">Manage operations</p>
+                    </div>
+                    <div class="auto-option" id="camera-btn">
+                        <div>📷</div>
+                        <h3 id="camera-text">CAMERA VIEW</h3>
+                        <p id="camera-desc">Live feed</p>
+                    </div>
+                </div>
+                <div id="auto-timer" style="text-align: center; margin-top: 20px;"></div>
+            </div>
+
+            <!-- Manual Mode Content -->
+            <div id="manual-mode" class="hidden">
+                <button class="btn back-btn" id="manual-back-btn">← BACK</button>
+                
+                <div class="manual-tabs">
+                    <button class="tab-btn active" id="driving-tab-btn">🚗 DRIVING</button>
+                    <button class="tab-btn" id="arm-tab-btn">🦾 ARM</button>
+                    <button class="tab-btn" id="sensor-tab-btn">📡 SENSOR</button>
+                </div>
+
+                <!-- Driving Tab -->
+                <div id="driving-tab" class="tab-content active">
+                    <div id="steering-container">
+                        <div id="steering-area">
+                            <div id="steering-knob"></div>
+                            <div class="steering-center" id="steering-center-text">Move</div>
+                        </div>
+                    </div>
+                    
+                    <div class="movement-buttons">
+                        <button class="movement-btn" id="forward-btn">↑ FORWARD</button>
+                        <button class="movement-btn" id="backward-btn">↓ BACKWARD</button>
+                    </div>
+
+                    <div style="margin: 15px 0;">
+                        <label id="speed-label">Speed: <span id="speed-value">150</span></label>
+                        <input type="range" min="0" max="255" value="150" id="speed-slider" style="width: 200px;">
+                    </div>
+
+                    <button class="btn btn-secondary" id="view-camera-btn">📷 VIEW CAMERA</button>
+                </div>
+
+                <!-- Arm Tab -->
+                <div id="arm-tab" class="tab-content">
+                    <div class="arm-sliders">
+                        <div class="arm-slider">
+                            <label id="arm-base-label">Base Rotation:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="1">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                        <div class="arm-slider">
+                            <label id="arm-shoulder-label">Shoulder:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="2">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                        <div class="arm-slider">
+                            <label id="arm-elbow-label">Elbow:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="3">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                        <div class="arm-slider">
+                            <label id="arm-wrist-label">Wrist:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="4">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                        <div class="arm-slider">
+                            <label id="arm-grip-label">Grip:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="5">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                        <div class="arm-slider">
+                            <label id="arm-camera-label">Camera:</label>
+                            <div class="slider-container">
+                                <input type="range" min="0" max="180" value="90" class="arm-slider-input" data-servo="6">
+                                <span class="slider-value">90°</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="arm-camera-btn">📷 ARM CAMERA</button>
+                </div>
+
+                <!-- Sensor Tab -->
+                <div id="sensor-tab" class="tab-content">
+                    <div style="text-align: center; margin: 30px 0;">
+                        <button class="btn btn-primary" id="lower-sensor-btn">LOWER SENSOR</button>
+                        <button class="btn btn-primary" id="raise-sensor-btn">RAISE SENSOR</button>
+                    </div>
+                    <div style="text-align: center;">
+                        <button class="btn btn-secondary" id="check-moisture-btn">CHECK MOISTURE</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <sidebar>
+            <div class="sidebar-card">
+                <h3 id="sensor-data-title">📊 SENSOR DATA</h3>
+                <div class="sensor-data">
+                    <span id="gps-label">GPS:</span> <span class="sensor-value" id="gps-data">--</span>
+                </div>
+                <div class="sensor-data">
+                    <span id="soil-label">Soil Moisture:</span> <span class="sensor-value" id="soil-data">--</span>
+                </div>
+                <div class="sensor-data">
+                    <span id="temp-label">Temperature:</span> <span class="sensor-value" id="temp-data">--</span>
+                </div>
+                <div class="sensor-data">
+                    <span id="humidity-label">Humidity:</span> <span class="sensor-value" id="humidity-data">--</span>
+                </div>
+                <div class="sensor-data">
+                    <span id="gas-label">Gas Level:</span> <span class="sensor-value" id="gas-data">--</span>
+                </div>
+                <div class="sensor-data">
+                    <span id="sun-label">Sunlight:</span> <span class="sensor-value" id="sun-data">--</span>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 id="controls-title">🔧 CONTROLS</h3>
+                <button class="btn btn-warning" id="instructions-btn" style="width: 100%; margin: 5px 0;">
+                    📖 INSTRUCTIONS
+                </button>
+                <button class="btn btn-danger" id="exit-btn" style="width: 100%; margin: 5px 0;">
+                    🚪 EXIT
+                </button>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 id="status-title">🔔 STATUS</h3>
+                <div id="connection-status" style="color: var(--primary-red);">Disconnected</div>
+                <div id="battery-status" style="margin-top: 10px;"><span id="battery-label">Battery:</span> --%</div>
+                <div id="signal-status" style="margin-top: 5px;"><span id="signal-label">Signal:</span> --</div>
+            </div>
+        </sidebar>
+
+        <!-- Footer -->
+        <footer>
+            <div id="footer-title">FARM BOT Controller v1.0</div>
+            <div id="current-time">--:--:--</div>
+            <div><span id="connection-label">Connection:</span> <span id="footer-status">OFFLINE</span></div>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const ESP_IP = "192.168.1.100";
+        let robotPoweredOn = false;
+        let currentLanguage = 'en';
+        let currentMode = 'selection';
+        let steeringActive = false;
+        let sensorData = {
+            gps: '32.123, 35.456',
+            soil: '65%',
+            temp: '25.3°C',
+            humidity: '45%',
+            gas: '12',
+            sun: '85%',
+            battery: '92%',
+            signal: 'Strong'
+        };
+
+        // الترجمات الكاملة
+        const translations = {
+            en: {
+                // Login
+                enter: "ENTER",
+                
+                // Header
+                autoMode: "AUTO MODE",
+                manualMode: "MANUAL MODE",
+                autoDesc: "Autonomous operations",
+                manualDesc: "Remote control",
+                ready: "READY",
+                start: "START",
+                stop: "STOP",
+                langBtn: "العربية",
+                
+                // Auto Mode
+                files: "FILES",
+                camera: "CAMERA VIEW",
+                filesDesc: "Manage operations",
+                cameraDesc: "Live feed",
+                back: "← BACK",
+                
+                // Manual Mode
+                driving: "🚗 DRIVING",
+                arm: "🦾 ARM",
+                sensor: "📡 SENSOR",
+                forward: "↑ FORWARD",
+                backward: "↓ BACKWARD",
+                speed: "Speed:",
+                viewCamera: "📷 VIEW CAMERA",
+                armCamera: "📷 ARM CAMERA",
+                
+                // Arm Labels
+                armBase: "Base Rotation:",
+                armShoulder: "Shoulder:",
+                armElbow: "Elbow:",
+                armWrist: "Wrist:",
+                armGrip: "Grip:",
+                armCamera: "Camera:",
+                
+                // Sensor Tab
+                lowerSensor: "LOWER SENSOR",
+                raiseSensor: "RAISE SENSOR",
+                checkMoisture: "CHECK MOISTURE",
+                
+                // Sidebar
+                sensorData: "📊 SENSOR DATA",
+                gps: "GPS:",
+                soil: "Soil Moisture:",
+                temp: "Temperature:",
+                humidity: "Humidity:",
+                gas: "Gas Level:",
+                sun: "Sunlight:",
+                controls: "🔧 CONTROLS",
+                instructions: "📖 INSTRUCTIONS",
+                exit: "🚪 EXIT",
+                status: "🔔 STATUS",
+                battery: "Battery:",
+                signal: "Signal:",
+                
+                // Footer
+                controller: "FARM BOT Controller v1.0",
+                connection: "Connection:"
+            },
+            ar: {
+                // Login
+                enter: "دخول",
+                
+                // Header
+                autoMode: "الوضع التلقائي",
+                manualMode: "التحكم اليدوي",
+                autoDesc: "عمليات ذاتية",
+                manualDesc: "تحكم عن بعد",
+                ready: "جاهز",
+                start: "تشغيل",
+                stop: "إيقاف",
+                langBtn: "English",
+                
+                // Auto Mode
+                files: "الملفات",
+                camera: "عرض الكاميرا",
+                filesDesc: "إدارة العمليات",
+                cameraDesc: "بث مباشر",
+                back: "← رجوع",
+                
+                // Manual Mode
+                driving: "🚗 القيادة",
+                arm: "🦾 الذراع",
+                sensor: "📡 المجس",
+                forward: "↑ أمام",
+                backward: "↓ خلف",
+                speed: "السرعة:",
+                viewCamera: "📷 عرض الكاميرا",
+                armCamera: "📷 كاميرا الذراع",
+                
+                // Arm Labels
+                armBase: "قاعدة الذراع:",
+                armShoulder: "الكتف:",
+                armElbow: "الكوع:",
+                armWrist: "المعصم:",
+                armGrip: "القبضة:",
+                armCamera: "الكاميرا:",
+                
+                // Sensor Tab
+                lowerSensor: "خفض المجس",
+                raiseSensor: "رفع المجس",
+                checkMoisture: "فحص الرطوبة",
+                
+                // Sidebar
+                sensorData: "📊 بيانات المجسات",
+                gps: "الموقع:",
+                soil: "رطوبة التربة:",
+                temp: "درجة الحرارة:",
+                humidity: "الرطوبة:",
+                gas: "مستوى الغاز:",
+                sun: "أشعة الشمس:",
+                controls: "🔧 التحكم",
+                instructions: "📖 التعليمات",
+                exit: "🚪 خروج",
+                status: "🔔 الحالة",
+                battery: "البطارية:",
+                signal: "الإشارة:",
+                
+                // Footer
+                controller: "روبوت المزرعة الإصدار 1.0",
+                connection: "الاتصال:"
+            }
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            initSteering();
+            initArmSliders();
+            setupEventListeners();
+            updateSensorData(); // Initialize sensor data
+            
+            // Focus on password input
+            document.getElementById('password-input').focus();
+            
+            // Simulate real sensor data updates
+            setInterval(updateSensorData, 2000);
+        }
+
+        function setupEventListeners() {
+            // Login
+            document.getElementById('login-btn').addEventListener('click', login);
+            document.getElementById('password-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') login();
+            });
+
+            // Power and navigation
+            document.getElementById('power-btn').addEventListener('click', togglePower);
+            document.getElementById('language-btn').addEventListener('click', toggleLanguage);
+            document.getElementById('exit-btn').addEventListener('click', sendExit);
+
+            // Mode navigation
+            document.getElementById('auto-mode-btn').addEventListener('click', enterAutoMode);
+            document.getElementById('manual-mode-btn').addEventListener('click', enterManualMode);
+            document.getElementById('auto-back-btn').addEventListener('click', goBack);
+            document.getElementById('manual-back-btn').addEventListener('click', goBack);
+
+            // Auto mode buttons
+            document.getElementById('files-btn').addEventListener('click', openFileManager);
+            document.getElementById('camera-btn').addEventListener('click', openCamera);
+
+            // Manual mode tabs
+            document.getElementById('driving-tab-btn').addEventListener('click', () => switchTab('driving-tab'));
+            document.getElementById('arm-tab-btn').addEventListener('click', () => switchTab('arm-tab'));
+            document.getElementById('sensor-tab-btn').addEventListener('click', () => switchTab('sensor-tab'));
+
+            // Driving controls
+            document.getElementById('forward-btn').addEventListener('click', () => sendCommand('F'));
+            document.getElementById('backward-btn').addEventListener('click', () => sendCommand('B'));
+            document.getElementById('view-camera-btn').addEventListener('click', openCamera);
+
+            // Sensor controls
+            document.getElementById('lower-sensor-btn').addEventListener('click', () => sendCommand('D'));
+            document.getElementById('raise-sensor-btn').addEventListener('click', () => sendCommand('U'));
+            document.getElementById('check-moisture-btn').addEventListener('click', checkSoilMoisture);
+
+            // Arm camera
+            document.getElementById('arm-camera-btn').addEventListener('click', openCamera);
+
+            // Instructions
+            document.getElementById('instructions-btn').addEventListener('click', showInstructions);
+
+            // Speed control
+            document.getElementById('speed-slider').addEventListener('input', function() {
+                const speed = this.value;
+                document.getElementById('speed-value').textContent = speed;
+                sendCommand(`SPEED_${speed}`);
+            });
+        }
+
+        function login() {
+            const password = document.getElementById('password-input').value;
+            if (password === '4321') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-interface').style.display = 'grid';
+                updateSensorData(); // Show initial sensor data
+            } else {
+                alert(currentLanguage === 'en' ? 'Wrong password! Please enter 4321' : 'كلمة مرور خاطئة! الرجاء إدخال 4321');
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        function togglePower() {
+            robotPoweredOn = !robotPoweredOn;
+            const powerBtn = document.getElementById('power-btn');
+            const status = robotPoweredOn ? 'Connected' : 'Disconnected';
+            const color = robotPoweredOn ? '#27ae60' : '#e74c3c';
+            
+            if (robotPoweredOn) {
+                powerBtn.textContent = translations[currentLanguage].stop;
+                powerBtn.style.background = 'var(--primary-green)';
+                sendCommand('S');
+            } else {
+                powerBtn.textContent = translations[currentLanguage].start;
+                powerBtn.style.background = 'var(--primary-red)';
+                sendCommand('T');
+            }
+            updateStatus(status, color);
+        }
+
+        function enterAutoMode() {
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('auto-mode').classList.add('active');
+            currentMode = 'auto';
+            document.getElementById('mode-indicator').textContent = translations[currentLanguage].autoMode;
+            startAutoTimer();
+        }
+
+        function enterManualMode() {
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('manual-mode').classList.add('active');
+            currentMode = 'manual';
+            document.getElementById('mode-indicator').textContent = translations[currentLanguage].manualMode;
+        }
+
+        function goBack() {
+            document.getElementById('auto-mode').classList.remove('active');
+            document.getElementById('manual-mode').classList.remove('active');
+            document.getElementById('mode-selection').classList.remove('hidden');
+            currentMode = 'selection';
+            document.getElementById('mode-indicator').textContent = translations[currentLanguage].ready;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            document.getElementById(tabName + '-btn').classList.add('active');
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            document.body.classList.toggle('rtl', currentLanguage === 'ar');
+            updateAllTexts();
+        }
+
+        function updateAllTexts() {
+            const t = translations[currentLanguage];
+            
+            // Update all texts
+            document.getElementById('login-btn').textContent = t.enter;
+            document.getElementById('auto-mode-text').textContent = t.autoMode;
+            document.getElementById('manual-mode-text').textContent = t.manualMode;
+            document.getElementById('auto-desc').textContent = t.autoDesc;
+            document.getElementById('manual-desc').textContent = t.manualDesc;
+            document.getElementById('mode-indicator').textContent = t.ready;
+            document.getElementById('power-btn').textContent = t.start;
+            document.getElementById('lang-text').textContent = t.langBtn;
+            
+            // Auto mode
+            document.getElementById('auto-back-btn').textContent = t.back;
+            document.getElementById('files-text').textContent = t.files;
+            document.getElementById('camera-text').textContent = t.camera;
+            document.getElementById('files-desc').textContent = t.filesDesc;
+            document.getElementById('camera-desc').textContent = t.cameraDesc;
+            
+            // Manual mode
+            document.getElementById('manual-back-btn').textContent = t.back;
+            document.getElementById('driving-tab-btn').textContent = t.driving;
+            document.getElementById('arm-tab-btn').textContent = t.arm;
+            document.getElementById('sensor-tab-btn').textContent = t.sensor;
+            document.getElementById('forward-btn').textContent = t.forward;
+            document.getElementById('backward-btn').textContent = t.backward;
+            document.getElementById('speed-label').textContent = t.speed;
+            document.getElementById('view-camera-btn').textContent = t.viewCamera;
+            document.getElementById('arm-camera-btn').textContent = t.armCamera;
+            
+            // Arm labels
+            document.getElementById('arm-base-label').textContent = t.armBase;
+            document.getElementById('arm-shoulder-label').textContent = t.armShoulder;
+            document.getElementById('arm-elbow-label').textContent = t.armElbow;
+            document.getElementById('arm-wrist-label').textContent = t.armWrist;
+            document.getElementById('arm-grip-label').textContent = t.armGrip;
+            document.getElementById('arm-camera-label').textContent = t.armCamera;
+            
+            // Sensor tab
+            document.getElementById('lower-sensor-btn').textContent = t.lowerSensor;
+            document.getElementById('raise-sensor-btn').textContent = t.raiseSensor;
+            document.getElementById('check-moisture-btn').textContent = t.checkMoisture;
+            
+            // Sidebar
+            document.getElementById('sensor-data-title').textContent = t.sensorData;
+            document.getElementById('gps-label').textContent = t.gps;
+            document.getElementById('soil-label').textContent = t.soil;
+            document.getElementById('temp-label').textContent = t.temp;
+            document.getElementById('humidity-label').textContent = t.humidity;
+            document.getElementById('gas-label').textContent = t.gas;
+            document.getElementById('sun-label').textContent = t.sun;
+            document.getElementById('controls-title').textContent = t.controls;
+            document.getElementById('instructions-btn').textContent = t.instructions;
+            document.getElementById('exit-btn').textContent = t.exit;
+            document.getElementById('status-title').textContent = t.status;
+            document.getElementById('battery-label').textContent = t.battery;
+            document.getElementById('signal-label').textContent = t.signal;
+            
+            // Footer
+            document.getElementById('footer-title').textContent = t.controller;
+            document.getElementById('connection-label').textContent = t.connection;
+        }
+
+        function initSteering() {
+            const steeringArea = document.getElementById('steering-area');
+            const knob = document.getElementById('steering-knob');
+            let isDragging = false;
+
+            function startDrag(e) {
+                e.preventDefault();
+                isDragging = true;
+                steeringActive = true;
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const rect = steeringArea.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                let clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                let deltaX = clientX - centerX;
+                let deltaY = clientY - centerY;
+                
+                const maxDistance = rect.width / 2 - 30;
+                const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), maxDistance);
+                
+                const angle = Math.atan2(deltaY, deltaX);
+                const knobX = Math.cos(angle) * distance;
+                const knobY = Math.sin(angle) * distance;
+
+                knob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+                
+                const steerX = Math.round((knobX / maxDistance) * 100);
+                const steerY = Math.round((knobY / maxDistance) * 100);
+                
+                sendCommand(`STEER_${steerX}_${steerY}`);
+            }
+
+            function stopDrag() {
+                isDragging = false;
+                steeringActive = false;
+                knob.style.transform = 'translate(-50%, -50%)';
+                sendCommand('STEER_0_0');
+            }
+
+            knob.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            knob.addEventListener('touchstart', startDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', stopDrag);
+        }
+
+        function initArmSliders() {
+            document.querySelectorAll('.arm-slider-input').forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const value = this.value;
+                    const servo = this.dataset.servo;
+                    this.nextElementSibling.textContent = value + '°';
+                    sendArmCommand(servo, value);
+                });
+            });
+        }
+
+        function updateSensorData() {
+            // في التطبيق الحقيقي، هذه البيانات ستأتي من الـ ESP32
+            // هنا نجعل البيانات أكثر واقعية مع تغييرات طفيفة
+            sensorData.soil = Math.floor(Math.random() * 30 + 60) + '%';
+            sensorData.temp = (Math.random() * 10 + 22).toFixed(1) + '°C';
+            sensorData.humidity = Math.floor(Math.random() * 30 + 40) + '%';
+            sensorData.gas = Math.floor(Math.random() * 5 + 10);
+            sensorData.sun = Math.floor(Math.random() * 20 + 75) + '%';
+            sensorData.battery = Math.floor(Math.random() * 10 + 85) + '%';
+
+            document.getElementById('gps-data').textContent = sensorData.gps;
+            document.getElementById('soil-data').textContent = sensorData.soil;
+            document.getElementById('temp-data').textContent = sensorData.temp;
+            document.getElementById('humidity-data').textContent = sensorData.humidity;
+            document.getElementById('gas-data').textContent = sensorData.gas;
+            document.getElementById('sun-data').textContent = sensorData.sun;
+            document.getElementById('battery-status').innerHTML = `<span id="battery-label">${translations[currentLanguage].battery}</span> ${sensorData.battery}`;
+            document.getElementById('signal-status').innerHTML = `<span id="signal-label">${translations[currentLanguage].signal}</span> ${sensorData.signal}`;
+        }
+
+        function sendCommand(cmd) {
+            if (!robotPoweredOn && !['S','T','X'].includes(cmd)) return;
+            
+            console.log(`Sending command: ${cmd}`);
+            // في التطبيق الحقيقي:
+            // fetch(`http://${ESP_IP}/command?cmd=${cmd}`);
+        }
+
+        function sendArmCommand(servoNum, angle) {
+            if (!robotPoweredOn) return;
+            sendCommand(`A${servoNum}_${angle}`);
+        }
+
+        function sendExit() {
+            sendCommand('X');
+            robotPoweredOn = false;
+            document.getElementById('power-btn').textContent = translations[currentLanguage].start;
+            document.getElementById('power-btn').style.background = 'var(--primary-red)';
+            updateStatus('Disconnected', '#e74c3c');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+        }
+
+        function updateStatus(status, color) {
+            const statusEl = document.getElementById('connection-status');
+            statusEl.textContent = status;
+            statusEl.style.color = color;
+            document.getElementById('footer-status').textContent = status;
+        }
+
+        function openCamera() {
+            window.open(`http://${ESP_IP}:81/stream`, 'Camera', 'width=800,height=600');
+        }
+
+        function openFileManager() {
+            alert(currentLanguage === 'en' ? 'File Manager would open here' : 'ستفتح هنا نافذة إدارة الملفات');
+        }
+
+        function showInstructions() {
+            const message = currentLanguage === 'en' 
+                ? 'FARM BOT Controller Instructions:\n\n1. Use START/STOP to control power\n2. Choose between Auto and Manual modes\n3. In Manual mode, use steering for direction\n4. Monitor sensor data in sidebar\n5. Use EXIT to safely disconnect'
+                : 'تعليمات استخدام روبوت المزرعة:\n\n1. استخدم زر التشغيل/الإيقاف للتحكم بالطاقة\n2. اختر بين الوضع التلقائي واليدوي\n3. في الوضع اليدوي، استخدم المقود للاتجاه\n4. تابع بيانات المجسات في الشريط الجانبي\n5. استخدم زر الخروج للفصل الآمن';
+            
+            alert(message);
+        }
+
+        function checkSoilMoisture() {
+            sendCommand('CHECK_SOIL');
+            // Simulate soil moisture check
+            const moisture = Math.floor(Math.random() * 30 + 60);
+            alert(currentLanguage === 'en' 
+                ? `Soil Moisture: ${moisture}%` 
+                : `رطوبة التربة: ${moisture}%`);
+        }
+
+        function startAutoTimer() {
+            let seconds = 0;
+            const timerEl = document.getElementById('auto-timer');
+            const interval = setInterval(() => {
+                if (currentMode !== 'auto') {
+                    clearInterval(interval);
+                    return;
+                }
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerEl.textContent = `Operation time: ${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
