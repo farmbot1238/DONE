@@ -41,6 +41,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
 
         .login-container {
@@ -50,10 +51,12 @@
             backdrop-filter: blur(10px);
             text-align: center;
             border: 2px solid var(--primary-green);
+            max-width: 400px;
+            width: 100%;
         }
 
         .robot-title {
-            font-size: 3em;
+            font-size: clamp(2em, 8vw, 3em);
             font-weight: bold;
             margin-bottom: 30px;
         }
@@ -70,7 +73,7 @@
             border-radius: 10px;
             margin: 20px 0;
             background: rgba(255,255,255,0.9);
-            -webkit-text-security: disc; /* إخفاء النص */
+            -webkit-text-security: disc;
         }
 
         .login-btn {
@@ -82,6 +85,7 @@
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            width: 200px;
         }
 
         .login-btn:hover {
@@ -93,14 +97,33 @@
         #main-interface {
             display: none;
             grid-template-areas: 
-                "header header"
-                "content sidebar"
-                "footer footer";
-            grid-template-rows: 80px 1fr 60px;
-            grid-template-columns: 1fr 300px;
+                "header"
+                "content"
+                "sidebar"
+                "footer";
+            grid-template-rows: auto 1fr auto auto;
+            grid-template-columns: 1fr;
             height: 100vh;
             padding: 10px;
             gap: 10px;
+        }
+
+        /* Responsive Grid for larger screens */
+        @media (min-width: 768px) {
+            #main-interface {
+                grid-template-areas: 
+                    "header header"
+                    "content sidebar"
+                    "footer footer";
+                grid-template-rows: 80px 1fr 60px;
+                grid-template-columns: 1fr 300px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #main-interface {
+                grid-template-columns: 1fr 350px;
+            }
         }
 
         /* Header */
@@ -111,22 +134,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
+            padding: 15px 20px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .header-left, .header-right {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .header-center {
+            flex: 2;
+            text-align: center;
+        }
+
+        .header-right {
+            justify-content: flex-end;
         }
 
         .mode-indicator {
             background: var(--primary-blue);
-            padding: 8px 20px;
+            padding: 8px 15px;
             border-radius: 20px;
             font-weight: bold;
+            font-size: clamp(0.8em, 2vw, 1em);
         }
 
         /* Main Content */
@@ -134,18 +170,25 @@
             grid-area: content;
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.1);
+            overflow: auto;
         }
 
         .mode-selection {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 15px;
             height: 100%;
+        }
+
+        @media (min-width: 480px) {
+            .mode-selection {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         .mode-card {
@@ -157,8 +200,9 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            min-height: 200px;
         }
 
         .mode-card:hover {
@@ -167,12 +211,12 @@
         }
 
         .mode-card i {
-            font-size: 4em;
-            margin-bottom: 20px;
+            font-size: clamp(2em, 10vw, 4em);
+            margin-bottom: 15px;
         }
 
         .mode-card h2 {
-            font-size: 1.8em;
+            font-size: clamp(1.2em, 4vw, 1.8em);
             margin-bottom: 10px;
         }
 
@@ -185,9 +229,15 @@
 
         .auto-options {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 15px;
             height: 100%;
+        }
+
+        @media (min-width: 480px) {
+            .auto-options {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         .auto-option {
@@ -199,7 +249,8 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.3s;
-            padding: 30px;
+            padding: 20px;
+            min-height: 150px;
         }
 
         .auto-option:hover {
@@ -215,18 +266,22 @@
 
         .manual-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
-            padding: 12px 25px;
+            padding: 10px 15px;
             background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 10px;
             color: white;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: clamp(0.8em, 3vw, 1em);
+            flex: 1;
+            min-width: 80px;
         }
 
         .tab-btn.active {
@@ -238,7 +293,9 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            overflow: auto;
+            padding: 10px 0;
         }
 
         .tab-content.active {
@@ -248,11 +305,11 @@
         /* Steering Control */
         #steering-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: min(300px, 80vw);
+            height: min(300px, 80vw);
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
-            margin: 20px auto;
+            margin: 15px auto;
         }
 
         #steering-area {
@@ -261,12 +318,13 @@
             height: 100%;
             border-radius: 50%;
             cursor: pointer;
+            touch-action: none;
         }
 
         #steering-knob {
             position: absolute;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: var(--primary-yellow);
             border-radius: 50%;
             top: 50%;
@@ -275,6 +333,7 @@
             cursor: move;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             border: 3px solid white;
+            touch-action: none;
         }
 
         .steering-center {
@@ -283,24 +342,25 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #7f8c8d;
-            font-size: 0.9em;
+            font-size: clamp(0.7em, 3vw, 0.9em);
         }
 
         /* Movement Buttons */
         .movement-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
+            gap: 12px;
+            margin: 15px 0;
+            width: min(300px, 80%);
         }
 
         .movement-btn {
-            padding: 20px 30px;
+            padding: 15px 20px;
             background: var(--primary-blue);
             border: none;
             border-radius: 10px;
             color: white;
-            font-size: 1.1em;
+            font-size: clamp(0.9em, 3vw, 1.1em);
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -314,22 +374,24 @@
         .arm-sliders {
             width: 100%;
             max-width: 400px;
+            padding: 0 10px;
         }
 
         .arm-slider {
-            margin: 15px 0;
+            margin: 12px 0;
         }
 
         .arm-slider label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--primary-yellow);
+            font-size: clamp(0.9em, 3vw, 1em);
         }
 
         .slider-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .slider-value {
@@ -338,6 +400,54 @@
             background: rgba(255,255,255,0.1);
             padding: 5px 10px;
             border-radius: 5px;
+            font-size: clamp(0.8em, 3vw, 0.9em);
+        }
+
+        /* Camera View */
+        #camera-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .camera-feed {
+            flex: 1;
+            background: #000;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .camera-placeholder {
+            color: #666;
+            font-size: clamp(1em, 4vw, 1.5em);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         /* Sidebar */
@@ -345,25 +455,27 @@
             grid-area: sidebar;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .sidebar-card {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
         .sensor-data {
-            font-size: 1.1em;
-            margin: 8px 0;
+            font-size: clamp(0.9em, 3vw, 1.1em);
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sensor-value {
             color: var(--primary-yellow);
-            float: right;
         }
 
         /* Footer */
@@ -374,19 +486,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
+            padding: 12px 20px;
             backdrop-filter: blur(5px);
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: clamp(0.8em, 2.5vw, 0.9em);
+        }
+
+        .footer-section {
+            flex: 1;
+            text-align: center;
+            min-width: 120px;
         }
 
         /* Buttons */
         .btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
             color: white;
+            font-size: clamp(0.8em, 3vw, 1em);
+            text-align: center;
         }
 
         .btn-primary {
@@ -434,7 +557,7 @@
 
         .back-btn {
             background: #7f8c8d;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             align-self: flex-start;
         }
 
@@ -445,6 +568,68 @@
 
         .sensor-normal {
             color: var(--primary-green);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 767px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            sidebar {
+                gap: 8px;
+            }
+            
+            .sidebar-card {
+                padding: 12px;
+            }
+            
+            footer {
+                padding: 10px 15px;
+            }
+            
+            .footer-section {
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 15px;
+            }
+            
+            .mode-card, .auto-option {
+                padding: 15px;
+                min-height: 150px;
+            }
+            
+            .manual-tabs {
+                gap: 5px;
+            }
+            
+            .tab-btn {
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
         }
     </style>
 </head>
@@ -457,6 +642,26 @@
             </div>
             <input type="password" class="password-input" id="password-input" placeholder="****" maxlength="4" inputmode="numeric">
             <button class="login-btn" id="login-btn">ENTER</button>
+        </div>
+    </div>
+
+    <!-- Camera View Overlay -->
+    <div id="camera-view" class="hidden">
+        <div class="camera-header">
+            <h2 id="camera-title">LIVE CAMERA FEED</h2>
+            <button class="btn btn-danger" id="close-camera-btn">✕ CLOSE</button>
+        </div>
+        <div class="camera-feed">
+            <div class="camera-placeholder" id="camera-placeholder">
+                📷 Camera feed will appear here<br>
+                <small>Connecting to FARM BOT camera...</small>
+            </div>
+            <img id="camera-stream" src="" style="display: none; max-width: 100%; max-height: 100%;">
+        </div>
+        <div class="camera-controls">
+            <button class="btn btn-secondary" id="switch-camera-btn">🔄 Switch Camera</button>
+            <button class="btn btn-primary" id="capture-btn">📸 Capture</button>
+            <button class="btn btn-warning" id="record-btn">⏺️ Record</button>
         </div>
     </div>
 
@@ -511,7 +716,7 @@
                         <p id="camera-desc">Live feed</p>
                     </div>
                 </div>
-                <div id="auto-timer" style="text-align: center; margin-top: 20px;"></div>
+                <div id="auto-timer" style="text-align: center; margin-top: 15px; font-size: clamp(0.9em, 3vw, 1.1em);"></div>
             </div>
 
             <!-- Manual Mode Content -->
@@ -538,9 +743,9 @@
                         <button class="movement-btn" id="backward-btn">↓ BACKWARD</button>
                     </div>
 
-                    <div style="margin: 15px 0;">
-                        <label id="speed-label">Speed: <span id="speed-value">150</span></label>
-                        <input type="range" min="0" max="255" value="150" id="speed-slider" style="width: 200px;">
+                    <div style="margin: 12px 0; text-align: center;">
+                        <label id="speed-label" style="font-size: clamp(0.9em, 3vw, 1.1em);">Speed: <span id="speed-value">150</span></label>
+                        <input type="range" min="0" max="255" value="150" id="speed-slider" style="width: min(250px, 80%); margin: 5px 0;">
                     </div>
 
                     <button class="btn btn-secondary" id="view-camera-btn">📷 VIEW CAMERA</button>
@@ -592,17 +797,17 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" id="arm-camera-btn">📷 ARM CAMERA</button>
+                    <button class="btn btn-secondary" id="arm-camera-btn" style="margin-top: 15px;">📷 ARM CAMERA</button>
                 </div>
 
                 <!-- Sensor Tab -->
                 <div id="sensor-tab" class="tab-content">
-                    <div style="text-align: center; margin: 30px 0;">
-                        <button class="btn btn-primary" id="lower-sensor-btn">LOWER SENSOR</button>
-                        <button class="btn btn-primary" id="raise-sensor-btn">RAISE SENSOR</button>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn btn-primary" id="lower-sensor-btn" style="margin: 8px; padding: 12px 20px;">LOWER SENSOR</button>
+                        <button class="btn btn-primary" id="raise-sensor-btn" style="margin: 8px; padding: 12px 20px;">RAISE SENSOR</button>
                     </div>
                     <div style="text-align: center;">
-                        <button class="btn btn-secondary" id="check-moisture-btn">CHECK MOISTURE</button>
+                        <button class="btn btn-secondary" id="check-moisture-btn" style="padding: 12px 25px;">CHECK MOISTURE</button>
                     </div>
                 </div>
             </div>
@@ -611,7 +816,7 @@
         <!-- Sidebar -->
         <sidebar>
             <div class="sidebar-card">
-                <h3 id="sensor-data-title">📊 SENSOR DATA</h3>
+                <h3 id="sensor-data-title" style="font-size: clamp(1em, 3vw, 1.2em); margin-bottom: 10px;">📊 SENSOR DATA</h3>
                 <div class="sensor-data">
                     <span id="gps-label">GPS:</span> <span class="sensor-value" id="gps-data">--</span>
                 </div>
@@ -633,28 +838,28 @@
             </div>
 
             <div class="sidebar-card">
-                <h3 id="controls-title">🔧 CONTROLS</h3>
-                <button class="btn btn-warning" id="instructions-btn" style="width: 100%; margin: 5px 0;">
+                <h3 id="controls-title" style="font-size: clamp(1em, 3vw, 1.2em); margin-bottom: 10px;">🔧 CONTROLS</h3>
+                <button class="btn btn-warning" id="instructions-btn" style="width: 100%; margin: 5px 0; padding: 10px;">
                     📖 INSTRUCTIONS
                 </button>
-                <button class="btn btn-danger" id="exit-btn" style="width: 100%; margin: 5px 0;">
+                <button class="btn btn-danger" id="exit-btn" style="width: 100%; margin: 5px 0; padding: 10px;">
                     🚪 EXIT
                 </button>
             </div>
 
             <div class="sidebar-card">
-                <h3 id="status-title">🔔 STATUS</h3>
-                <div id="connection-status" style="color: var(--primary-red);">Disconnected</div>
-                <div id="battery-status" style="margin-top: 10px;"><span id="battery-label">Battery:</span> --%</div>
-                <div id="signal-status" style="margin-top: 5px;"><span id="signal-label">Signal:</span> --</div>
+                <h3 id="status-title" style="font-size: clamp(1em, 3vw, 1.2em); margin-bottom: 10px;">🔔 STATUS</h3>
+                <div id="connection-status" style="color: var(--primary-red); font-size: clamp(0.9em, 3vw, 1em);">Disconnected</div>
+                <div id="battery-status" style="margin-top: 8px; font-size: clamp(0.9em, 3vw, 1em);"><span id="battery-label">Battery:</span> --%</div>
+                <div id="signal-status" style="margin-top: 5px; font-size: clamp(0.9em, 3vw, 1em);"><span id="signal-label">Signal:</span> --</div>
             </div>
         </sidebar>
 
         <!-- Footer -->
         <footer>
-            <div id="footer-title">FARM BOT Controller v1.0</div>
-            <div id="current-time">--:--:--</div>
-            <div><span id="connection-label">Connection:</span> <span id="footer-status">OFFLINE</span></div>
+            <div class="footer-section" id="footer-title">FARM BOT Controller v1.0</div>
+            <div class="footer-section" id="current-time">--:--:--</div>
+            <div class="footer-section"><span id="connection-label">Connection:</span> <span id="footer-status">OFFLINE</span></div>
         </footer>
     </div>
 
@@ -739,7 +944,14 @@
                 
                 // Footer
                 controller: "FARM BOT Controller v1.0",
-                connection: "Connection:"
+                connection: "Connection:",
+                
+                // Camera
+                cameraTitle: "LIVE CAMERA FEED",
+                closeCamera: "✕ CLOSE",
+                switchCamera: "🔄 Switch Camera",
+                capture: "📸 Capture",
+                record: "⏺️ Record"
             },
             ar: {
                 // Login
@@ -802,7 +1014,14 @@
                 
                 // Footer
                 controller: "روبوت المزرعة الإصدار 1.0",
-                connection: "الاتصال:"
+                connection: "الاتصال:",
+                
+                // Camera
+                cameraTitle: "البث المباشر للكاميرا",
+                closeCamera: "✕ إغلاق",
+                switchCamera: "🔄 تبديل الكاميرا",
+                capture: "📸 التقاط",
+                record: "⏺️ تسجيل"
             }
         };
 
@@ -817,12 +1036,9 @@
             initSteering();
             initArmSliders();
             setupEventListeners();
-            updateSensorData(); // Initialize sensor data
+            updateSensorData();
             
-            // Focus on password input
             document.getElementById('password-input').focus();
-            
-            // Simulate real sensor data updates
             setInterval(updateSensorData, 2000);
         }
 
@@ -847,6 +1063,8 @@
             // Auto mode buttons
             document.getElementById('files-btn').addEventListener('click', openFileManager);
             document.getElementById('camera-btn').addEventListener('click', openCamera);
+            document.getElementById('view-camera-btn').addEventListener('click', openCamera);
+            document.getElementById('arm-camera-btn').addEventListener('click', openCamera);
 
             // Manual mode tabs
             document.getElementById('driving-tab-btn').addEventListener('click', () => switchTab('driving-tab'));
@@ -856,15 +1074,11 @@
             // Driving controls
             document.getElementById('forward-btn').addEventListener('click', () => sendCommand('F'));
             document.getElementById('backward-btn').addEventListener('click', () => sendCommand('B'));
-            document.getElementById('view-camera-btn').addEventListener('click', openCamera);
 
             // Sensor controls
             document.getElementById('lower-sensor-btn').addEventListener('click', () => sendCommand('D'));
             document.getElementById('raise-sensor-btn').addEventListener('click', () => sendCommand('U'));
             document.getElementById('check-moisture-btn').addEventListener('click', checkSoilMoisture);
-
-            // Arm camera
-            document.getElementById('arm-camera-btn').addEventListener('click', openCamera);
 
             // Instructions
             document.getElementById('instructions-btn').addEventListener('click', showInstructions);
@@ -875,6 +1089,12 @@
                 document.getElementById('speed-value').textContent = speed;
                 sendCommand(`SPEED_${speed}`);
             });
+
+            // Camera controls
+            document.getElementById('close-camera-btn').addEventListener('click', closeCamera);
+            document.getElementById('switch-camera-btn').addEventListener('click', switchCamera);
+            document.getElementById('capture-btn').addEventListener('click', captureImage);
+            document.getElementById('record-btn').addEventListener('click', toggleRecording);
         }
 
         function login() {
@@ -882,7 +1102,7 @@
             if (password === '4321') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-interface').style.display = 'grid';
-                updateSensorData(); // Show initial sensor data
+                updateSensorData();
             } else {
                 alert(currentLanguage === 'en' ? 'Wrong password! Please enter 4321' : 'كلمة مرور خاطئة! الرجاء إدخال 4321');
                 document.getElementById('password-input').value = '';
@@ -1006,6 +1226,13 @@
             // Footer
             document.getElementById('footer-title').textContent = t.controller;
             document.getElementById('connection-label').textContent = t.connection;
+            
+            // Camera
+            document.getElementById('camera-title').textContent = t.cameraTitle;
+            document.getElementById('close-camera-btn').textContent = t.closeCamera;
+            document.getElementById('switch-camera-btn').textContent = t.switchCamera;
+            document.getElementById('capture-btn').textContent = t.capture;
+            document.getElementById('record-btn').textContent = t.record;
         }
 
         function initSteering() {
@@ -1074,9 +1301,42 @@
             });
         }
 
+        // Camera functions
+        function openCamera() {
+            document.getElementById('camera-view').classList.add('active');
+            // في التطبيق الحقيقي، هنا سيتم تشغيل بث الكاميرا
+            // simulateCameraStream();
+        }
+
+        function closeCamera() {
+            document.getElementById('camera-view').classList.remove('active');
+        }
+
+        function switchCamera() {
+            alert(currentLanguage === 'en' ? 'Switching camera...' : 'جاري تبديل الكاميرا...');
+        }
+
+        function captureImage() {
+            alert(currentLanguage === 'en' ? 'Image captured!' : 'تم التقاط الصورة!');
+        }
+
+        function toggleRecording() {
+            const recordBtn = document.getElementById('record-btn');
+            const isRecording = recordBtn.textContent.includes('⏹️');
+            
+            if (isRecording) {
+                recordBtn.textContent = currentLanguage === 'en' ? '⏺️ Record' : '⏺️ تسجيل';
+                recordBtn.style.background = 'var(--primary-yellow)';
+                alert(currentLanguage === 'en' ? 'Recording stopped!' : 'تم إيقاف التسجيل!');
+            } else {
+                recordBtn.textContent = currentLanguage === 'en' ? '⏹️ Stop' : '⏹️ إيقاف';
+                recordBtn.style.background = 'var(--primary-red)';
+                alert(currentLanguage === 'en' ? 'Recording started!' : 'بدأ التسجيل!');
+            }
+        }
+
         function updateSensorData() {
             // في التطبيق الحقيقي، هذه البيانات ستأتي من الـ ESP32
-            // هنا نجعل البيانات أكثر واقعية مع تغييرات طفيفة
             sensorData.soil = Math.floor(Math.random() * 30 + 60) + '%';
             sensorData.temp = (Math.random() * 10 + 22).toFixed(1) + '°C';
             sensorData.humidity = Math.floor(Math.random() * 30 + 40) + '%';
@@ -1127,10 +1387,6 @@
             document.getElementById('footer-status').textContent = status;
         }
 
-        function openCamera() {
-            window.open(`http://${ESP_IP}:81/stream`, 'Camera', 'width=800,height=600');
-        }
-
         function openFileManager() {
             alert(currentLanguage === 'en' ? 'File Manager would open here' : 'ستفتح هنا نافذة إدارة الملفات');
         }
@@ -1145,7 +1401,6 @@
 
         function checkSoilMoisture() {
             sendCommand('CHECK_SOIL');
-            // Simulate soil moisture check
             const moisture = Math.floor(Math.random() * 30 + 60);
             alert(currentLanguage === 'en' 
                 ? `Soil Moisture: ${moisture}%` 
